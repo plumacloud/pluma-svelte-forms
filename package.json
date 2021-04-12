@@ -1,0 +1,40 @@
+{
+  "name": "pluma-svelte-forms",
+  "version": "0.0.1",
+  "description": "Form validation for Svelte",
+  "svelte": "src/index.js",
+  "main": "src/index.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "dev": "cd demo-app && rollup -c -w",
+    "build-demo-app": "cd demo-app && rollup -c",
+    "start-sirv": "sirv demo-app/public -s --no-clear --dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plumacloud/pluma-svelte-forms.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/plumacloud/pluma-svelte-forms/issues"
+  },
+  "homepage": "https://github.com/plumacloud/pluma-svelte-forms#readme",
+  "devDependencies": {
+    "@rollup/plugin-alias": "^3.1.2",
+    "@rollup/plugin-commonjs": "^18.0.0",
+    "@rollup/plugin-node-resolve": "^11.2.1",
+    "pluma-svelte-router": "0.0.10",
+    "rollup": "^2.45.1",
+    "rollup-plugin-css-only": "^3.1.0",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-size-snapshot": "^0.12.0",
+    "rollup-plugin-svelte": "^7.1.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "sirv-cli": "^1.0.11",
+    "svelte": "^3.37.0"
+  }
+}
