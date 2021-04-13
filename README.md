@@ -35,5 +35,5 @@ This is a client-side form library for Svelte. It's super early in developement 
 * `validClass` custom CSS class that will be applied to valid input elements. The default is `valid`.
 * `invalidClass` custom CSS class that will be applied to invalid input elements. The default is `invalid`.
 * `useNativeErrorTooltips` use the browser's error tooltips. Defaults to `false`.
-* `displayedErrors` a [Svelte writable](https://svelte.dev/docs#svelte_store) you can pass to subscribe to displayed errors
-* `controllerState` a [Svelte writable](https://svelte.dev/docs#svelte_store) you can pass to subscribe to the form controller state
+* `displayedErrors` a [Svelte writable](https://svelte.dev/docs#svelte_store) that will be updated with displayed errors
+* `controllerState` a [Svelte writable](https://svelte.dev/docs#svelte_store) that will be updated with the controller state
