@@ -5,26 +5,26 @@ This is a client-side form library for Svelte. It's super early in developement 
 ## Getting started
 ```svelte
 <script>
-	import {controller} from 'pluma-svelte-forms';
-	import {writable} from 'svelte/store';
+  import {controller} from 'pluma-svelte-forms';
+  import {writable} from 'svelte/store';
 
-	const displayedErrors = writable(null);
-	const controllerState = writable(null);
+  const displayedErrors = writable(null);
+  const controllerState = writable(null);
 
-	const settings = {
-		async onSubmit (values) {
-			console.log(values)
-		},
-		displayedErrors,
-		controllerState
-	}
+  const settings = {
+    async onSubmit (values) {
+      console.log(values)
+    },
+    displayedErrors,
+    controllerState
+  }
 
 </script>
 
 <form use:controller={settings}>
-	<input type="email" name="email" required>
-	<input type="password" name="password" required>
-	<button type="submit">Submit</button>
+  <input type="email" name="email" required>
+  <input type="password" name="password" required>
+  <button type="submit">Submit</button>
 </form>
 
 ```
