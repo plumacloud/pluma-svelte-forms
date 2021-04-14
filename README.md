@@ -2,6 +2,8 @@
 
 This is a client-side form library for Svelte. It's super early in developement so expect bugs, changes, and dragons.
 
+Demo app: https://pluma-svelte-forms.netlify.app/
+
 ## Getting started
 ```svelte
 <script>
