@@ -1,20 +1,16 @@
 import {writable, get} from 'svelte/store';
-
-const InputTypes = {
-	'SUBMIT': 'submit',
-	'CHECKBOX': 'checkbox'
-}
+import {InputTypes, NativeValidationErrors} from './enums/index.js';
 
 export default class FormController {
 	constructor (config) {
 
 		this.controllerState = null;
+		this.displayedErrorNames = [];
 
 		// Bind handlers
 		this.onSubmit = this.onSubmit.bind(this);
-		this.onInvalid = this.onInvalid.bind(this);
-		this.onInput = this.onInput.bind(this);
 		this.onChange = this.onChange.bind(this);
+		// this.onInput = this.onChange;
 		this.onBlur = this.onBlur.bind(this);
 		this.onFocus = this.onFocus.bind(this);
 
@@ -22,9 +18,12 @@ export default class FormController {
 		this.settings = {};
 		this.settings.fields = config.fields ? config.fields : {};
 		this.settings.onSubmit = config.onSubmit;
-		this.settings.useNativeErrorTooltips = typeof config.useNativeErrorTooltips !== 'undefined' ? config.useNativeErrorTooltips : false;
-		this.settings.validClass = typeof config.validClass === 'string' ? config.validClass : 'valid';
-		this.settings.invalidClass = typeof config.invalidClass === 'string' ? config.invalidClass : 'invalid';
+		this.settings.useNativeErrorTooltips = getValueOrDefault(config.useNativeErrorTooltips, false);
+		this.settings.validClass = getValueOrDefault(config.validClass, 'valid');
+		this.settings.invalidClass = getValueOrDefault(config.invalidClass, 'invalid');
+		this.settings.displayErrorsOnBlur = getValueOrDefault(config.displayErrorsOnBlur, false);
+		this.settings.hideErrorsOnFocus = getValueOrDefault(config.hideErrorsOnFocus, false);
+		this.settings.hideErrorsOnInput = getValueOrDefault(config.hideErrorsOnInput, true);
 
 		this.form = config.form;
 		this.form.addEventListener('submit', this.onSubmit);
@@ -33,111 +32,69 @@ export default class FormController {
 
 		// stores
 		this.stores = {};
-		this.stores.errors = config.displayedErrors;
+		this.stores.displayedErrors = config.displayedErrors;
 		this.stores.controllerState = config.controllerState;
 
 		// init inputs
-		const inputs = this.getInputElements();
+		const inputs = getFormInputElements(this.form);
 		inputs.forEach((input) => this.addListenersToInput(input));
 
 		this.updateFormState();
 	}
 
 	addListenersToInput (input) {
-		input.addEventListener('invalid', this.onInvalid);
-		input.addEventListener('input', this.onInput);
+		input.addEventListener('input', this.onChange);
+		input.addEventListener('change', this.onChange);
 		input.addEventListener('blur', this.onBlur);
 		input.addEventListener('focus', this.onFocus);
 	}
 
 	removeListenersFromInput (input) {
-		input.removeEventListener('invalid', this.onInvalid);
-		input.removeEventListener('input', this.onInput);
+		input.removeEventListener('input', this.onChange);
+		input.removeEventListener('change', this.onChangee);
 		input.removeEventListener('blur', this.onBlur);
 		input.removeEventListener('focus', this.onFocus);
 	}
 
 	destroy () {
-		form.removeEventListener('submit', this.onSubmit);
-
-		const inputs = this.getInputElements();
+		this.form.removeEventListener('submit', this.onSubmit);
+		const inputs = getFormInputElements(this.form);
 		inputs.forEach((input) => this.removeListenersFromInput(input));
 	}
 
-	// ------------------------------------------------
-	// State
-	// ------------------------------------------------
-
 	updateFormState () {
-		// console.time('updateFormState');
-		const state = this.getFormState();
+		const state = getFormState(this.form);
 		this.controllerState = state;
-		// console.timeEnd('updateFormState');
 		if (this.stores.controllerState) this.stores.controllerState.set(this.controllerState);
 	}
 
-	updateFieldState (input) {
-		const state = this.getInputState(input);
+	updateAllDisplayedErrors () {
+		let errors = null;
 
-		this.controllerState.fields[state.name] = {
-			value: state.value,
-			type: state.type,
-			valid: state.valid
-		};
+		Object.keys(this.controllerState.fields).forEach((name) => {
 
-		this.updateFormIsValid()
+			const input = getInputByName(this.form, name);
+			const displayError = this.displayedErrorNames.indexOf(name) !== -1;
+			const field = this.controllerState.fields[name];
 
-		if (this.stores.controllerState) this.stores.controllerState.set(this.controllerState);
-	}
+			input.classList.remove(this.settings.invalidClass, this.settings.validClass);
 
-	updateFormIsValid () {
-
-	}
-
-	getFormState () {
-		const state = {
-			formIsValid : true,
-			fields: {}
-		};
-
-		const inputs = this.getInputElements();
-
-		inputs.forEach((input) => {
-			const inputState = this.getInputState(input);
-
-			if (inputState) {
-
-				if (!inputState.valid) state.formIsValid = false;
-
-				state.fields[inputState.name] = {
-					value: inputState.value,
-					type: inputState.type,
-					valid: inputState.valid
-				}
+			if (field.valid) {
+				if (this.settings.validClass) input.classList.add(this.settings.validClass);
+				return;
 			}
+
+			if (!displayError) {
+				return;
+			}
+
+			// if the field is invalid and we must display the error
+			if (!errors) errors = {};
+			errors[name] = field.error;
+			if (this.settings.invalidClass) input.classList.add(this.settings.invalidClass);
 		});
 
-		return state;
-	}
-
-	getInputState (input) {
-		let {name, type, value, checked} = input;
-
-		// console.log({name, type, value, checked});
-
-		switch (type) {
-			// Ignore
-			case InputTypes.SUBMIT:
-				return null;
-				break;
-			case InputTypes.CHECKBOX:
-				value = checked;
-				break;
-		}
-
-		const valid = input.validity.valid;
-
-		return {name, value, type, valid};
+		if (this.stores.displayedErrors) this.stores.displayedErrors.set(errors);
 	}
 
 	// ------------------------------------------------
@@ -149,79 +106,152 @@ export default class FormController {
 		event.stopPropagation();
 
 		if (this.controllerState.formIsValid) {
-			const values = this.getValuesFromState();
+			const values = getValuesFromState(this.controllerState);
 			await this.settings.onSubmit(values);
+		} else {
+			this.displayedErrorNames = Object.keys(this.controllerState.fields);
+			this.updateAllDisplayedErrors();
 		}
 	}
 
-	onInvalid (event) {
-		event.target.classList.add(this.settings.invalidClass);
-	}
+	// onInput (event) {
+	// 	this.updateFormState();
 
-	onInput (event) {
-		const input = event.target;
+	// 	const field = this.controllerState.fields[event.target.name];
 
-		input.classList.remove(this.settings.invalidClass);
-		if (input.validity.valid) input.classList.add(this.settings.validClass);
-
-		this.updateFormState();
-	}
-
-	onChange (event) {
-		const input = event.target;
-
-		input.classList.remove(this.settings.invalidClass);
-		if (input.validity.valid) input.classList.add(this.settings.validClass);
-
-		this.updateFormState();
-	}
-
-	onBlur (event) {}
-
-	onFocus (event) {}
-
-	// ------------------------------------------------
-	// Validation
-	// ------------------------------------------------
-
-	// async checkFieldCustomValidators (input) {
-	// 	const name = input.getAttribute("name");
-
-	// 	// if the field doesn't have any config or any validator consider it valid
-	// 	if (!this.settings.fields[name] || !this.settings.fields[name].validators) return true;
-
-	// 	const validators = this.settings.fields[name].validators;
-
-	// 	for (var i = 0; i < validators.length; i++) {
-	// 		if (validators[i].then) await validators[i];
+	// 	if (!field.valid && this.settings.hideErrorsOnInput) {
+	// 		this.displayedErrorNames = this.displayedErrorNames.filter(name => name !== field.name);
+	// 	} else {
+	// 		if (this.displayedErrorNames.indexOf(field.name) === -1) this.displayedErrorNames.push(field.name);
 	// 	}
+
+	// 	this.updateAllDisplayedErrors();
 	// }
 
+	onChange (event) {
+		this.updateFormState();
 
-	// ------------------------------------------------
-	// Utils
-	// ------------------------------------------------
-
-	getValuesFromState () {
-		const values = {};
-
-		Object.keys(this.controllerState.fields).map((name) => {
-			values[name] = this.controllerState.fields[name].value;
-		});
-
-		return values;
-	}
-
-	getInputElements () {
-		const htmlCollection = this.form.elements;
-		const inputs = [];
-
-		for (var i = 0; i < htmlCollection.length; i++) {
-			inputs.push(htmlCollection[i]);
+		if (this.settings.hideErrorsOnInput) {
+			this.displayedErrorNames = this.displayedErrorNames.filter(name => name !== event.target.name);
 		}
 
-		return inputs;
-
-		// return this.form.querySelectorAll('input, select, textarea');
+		this.updateAllDisplayedErrors();
 	}
+
+	onBlur (event) {
+		this.updateFormState();
+
+		if (this.settings.displayErrorsOnBlur) {
+			const name = event.target.name;
+			if (this.displayedErrorNames.indexOf(name) === -1) this.displayedErrorNames.push(name);
+		}
+
+		this.updateAllDisplayedErrors();
+	}
+
+	onFocus (event) {
+		this.updateFormState();
+
+		if (this.settings.hideErrorsOnFocus) {
+			this.displayedErrorNames = this.displayedErrorNames.filter(name => name !== event.target.name);
+		}
+
+		this.updateAllDisplayedErrors();
+	}
+}
+
+// ------------------------------------------------
+//
+// UTILS
+//
+// ------------------------------------------------
+
+function getValuesFromState (state) {
+	const values = {};
+
+	Object.keys(state.fields).map((name) => {
+		values[name] = state.fields[name].value;
+	});
+
+	return values;
+}
+
+function getFormInputElements (form) {
+	const htmlCollection = form.elements;
+	const inputs = [];
+
+	for (var i = 0; i < htmlCollection.length; i++) {
+		inputs.push(htmlCollection[i]);
+	}
+
+	return inputs;
+}
+
+function getInputByName (form, name) {
+	return form.querySelectorAll(`input[name="${name}"]`)[0];
+}
+
+function getErrorFromValidity (validity) {
+	if (validity.valueMissing) return NativeValidationErrors.VALUE_MISSING;
+	if (validity.typeMismatch) return NativeValidationErrors.TYPE_MISMATCH;
+	if (validity.badInput) return NativeValidationErrors.BAD_INPUT;
+	if (validity.patternMismatch) return NativeValidationErrors.PATTERN_MISMATCH;
+	if (validity.rangeOverflow) return NativeValidationErrors.RANGE_OVERFLOW;
+	if (validity.rangeUnderflow) return NativeValidationErrors.RANGE_UNDERFLOW;
+	if (validity.stepMismatch) return NativeValidationErrors.STEP_MISMATCH;
+	if (validity.tooLong) return NativeValidationErrors.TOO_LONG;
+	if (validity.tooShort) return NativeValidationErrors.TOO_SHORT;
+
+	throw 'Unknown native validation error';
+}
+
+function getValueOrDefault (value, defaultValue) {
+	if (typeof value !== 'undefined') return value;
+	else return defaultValue;
+}
+
+function getFormState (form) {
+	const state = {
+		formIsValid : true,
+		fields: {}
+	};
+
+	const inputs = getFormInputElements(form);
+
+	inputs.forEach((input) => {
+		const inputState = getInputState(input);
+
+		if (inputState) {
+			if (!inputState.valid) state.formIsValid = false;
+			state.fields[inputState.name] = inputState;
+		}
+	});
+
+	return state;
+}
+
+function getInputState (input) {
+	let {name, type, value, checked} = input;
+
+	// console.log({name, type, value, checked});
+
+	switch (type) {
+		// Ignore
+		case InputTypes.SUBMIT:
+			return null;
+			break;
+		case InputTypes.CHECKBOX:
+			value = checked;
+			break;
+	}
+
+	const valid = input.validity.valid;
+
+	const state = {name, value, type, valid};
+
+	if (!valid) {
+		state.error = getErrorFromValidity(input.validity);
+	}
+
+	return state;
 }

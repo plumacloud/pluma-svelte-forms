@@ -26,14 +26,16 @@ This is a client-side form library for Svelte. It's super early in developement 
   <input type="password" name="password" required>
   <button type="submit">Submit</button>
 </form>
-
 ```
 
 ## `controller` action settings
 
 * `onSubmit` a callback function that will be triggered when all validation has passed and the form is submitted.
-* `validClass` custom CSS class that will be applied to valid input elements. The default is `valid`.
-* `invalidClass` custom CSS class that will be applied to invalid input elements. The default is `invalid`.
+* `validClass` custom CSS class that will be applied to valid input elements. The default is `valid`. If set to `null` no class will be applied.
+* `invalidClass` custom CSS class that will be applied to invalid input elements. The default is `invalid`. If set to `null` no class will be applied.
 * `useNativeErrorTooltips` use the browser's error tooltips. Defaults to `false`.
 * `displayedErrors` a [Svelte writable](https://svelte.dev/docs#svelte_store) that will be updated with displayed errors
 * `controllerState` a [Svelte writable](https://svelte.dev/docs#svelte_store) that will be updated with the controller state
+* `displayErrorsOnBlur` display fields errors on `blur` events. The default is `false`.
+* `hideErrorsOnFocus` hide field errors on `focus` events. The default is `false`.
+* `hideErrorsOnInput` hide field errors on `input` and `change` events. The default is `true`.

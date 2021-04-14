@@ -2,11 +2,10 @@
 	import {controller} from 'pluma-svelte-forms';
 	import {writable} from 'svelte/store';
 
-	let submittedValues;
+	let submittedValues, emailIsValid, passwordIsValid, showEmailError, showPasswordError, showAcceptError;
 
 	const displayedErrors = writable(null);
 	const controllerState = writable(null);
-
 
 	const settings = {
 		async onSubmit (values) {
@@ -18,23 +17,44 @@
 		controllerState
 	}
 
+	$: {
+		emailIsValid = $controllerState && $controllerState.fields.email.valid ? true : false;
+		passwordIsValid = $controllerState && $controllerState.fields.password.valid ? true : false;
+		showEmailError = $displayedErrors && $displayedErrors.email ? true : false;
+		showPasswordError = $displayedErrors && $displayedErrors.password ? true : false;
+		showAcceptError = $displayedErrors && $displayedErrors.accept ? true : false;
+	}
+
 </script>
 
 <div class="wrap">
-	<h1 class="mb-4">Basic form</h1>
+	<h1 class="mb-4">Form with errors</h1>
 
 	<form use:controller={settings} class="mb-5">
 		<div class="mb-3">
 			<label for="exampleInputEmail1" class="form-label">Email address</label>
 			<input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+			{#if emailIsValid}
+				<div class="valid-feedback">Looks good!</div>
+			{:else if showEmailError}
+				<div class="invalid-feedback">Please use a valid email address</div>
+			{/if}
 		</div>
 		<div class="mb-3">
 			<label for="exampleInputPassword1" class="form-label">Password</label>
 			<input type="password" name="password" class="form-control" id="exampleInputPassword1" required>
+			{#if passwordIsValid}
+				<div class="valid-feedback">Looks good!</div>
+			{:else if showPasswordError}
+				<div class="invalid-feedback">Please write a password</div>
+			{/if}
 		</div>
 		<div class="mb-3 form-check">
 			<input type="checkbox" name="accept" class="form-check-input" id="accept" required>
 			<label class="form-check-label" for="accept">I accept the terms and conditions</label>
+			{#if showAcceptError}
+				<div class="invalid-feedback">You must agree before submitting.</div>
+			{/if}
 		</div>
 		<button type="submit" class="btn btn-primary">Submit</button>
 	</form>
