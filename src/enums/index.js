@@ -14,3 +14,9 @@ export const NativeValidationErrors = {
 	TYPE_MISMATCH: 'typeMismatch',
 	VALUE_MISSING: 'valueMissing'
 }
+
+export const ValidationStates = {
+	VALID: 'VALID',
+	INVALID: 'INVALID',
+	PENDING: 'PENDING'
+}

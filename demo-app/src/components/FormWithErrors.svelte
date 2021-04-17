@@ -18,11 +18,11 @@
 	}
 
 	$: {
-		emailIsValid = $controllerState && $controllerState.fields.email.valid ? true : false;
-		passwordIsValid = $controllerState && $controllerState.fields.password.valid ? true : false;
-		showEmailError = $displayedErrors && $displayedErrors.email ? true : false;
-		showPasswordError = $displayedErrors && $displayedErrors.password ? true : false;
-		showAcceptError = $displayedErrors && $displayedErrors.accept ? true : false;
+		emailIsValid = $controllerState?.fields?.email.valid || false;
+		passwordIsValid = $controllerState?.fields?.password.valid || false;
+		showEmailError = $displayedErrors?.email || false;
+		showPasswordError = $displayedErrors?.password || false;
+		showAcceptError = $displayedErrors?.accept || false;
 	}
 
 </script>
@@ -30,7 +30,7 @@
 <div class="wrap">
 	<h1 class="mb-4">Form with errors</h1>
 
-	<form use:controller={settings} class="mb-5">
+	<form use:controller={settings} class="mb-5" autocomplete="off">
 		<div class="mb-3">
 			<label for="exampleInputEmail1" class="form-label">Email address</label>
 			<input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
