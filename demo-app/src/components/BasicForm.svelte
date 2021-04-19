@@ -12,7 +12,6 @@
 		async onSubmit (values) {
 			submittedValues = values;
 		},
-		hideErrorsOnChange: true,
 		validClass: 'is-valid',
 		invalidClass: 'is-invalid',
 		displayedErrors,
