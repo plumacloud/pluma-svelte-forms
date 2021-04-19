@@ -158,8 +158,8 @@ export default class FormController {
 			return fieldState;
 		}
 
-		if (validators) {
-			const error = validateValueWithValidators(value, validators);
+		if (fieldSettings.validators) {
+			const error = validateValueWithValidators(value, fieldSettings.validators);
 
 			if (error !== true) {
 				fieldState.validationState = INVALID;
