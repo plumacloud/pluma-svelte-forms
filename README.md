@@ -84,7 +84,6 @@ Optional:
 * `controllerState` a [Svelte writable](https://svelte.dev/docs#svelte_store) that will be updated with the controller state
 * `displayErrorsOnBlur` display field errors on `blur` events. The default is `false`.
 * `displayErrorsOnChange` display field errors on `change` and `input` events. The default is `false`.
-* `keepErrorsOnBlur` keep dusplaying field errors on `blur`. The default is `true`.
 * `hideErrorsOnChange` hide field errors on `change` and `input` events. The default is `false`.
 
 ### Field configurations
