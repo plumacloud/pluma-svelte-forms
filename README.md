@@ -4,6 +4,12 @@ This is a client-side form library for Svelte. It's super early in developement 
 
 Demo app: https://pluma-svelte-forms.netlify.app/
 
+To install:
+
+```
+npm i pluma-svelte-forms
+```
+
 ## Main features
 * <a href="https://bundlephobia.com/result?p=pluma-svelte-forms" target="_blank" rel="noopener">Less than 3kB gzip</a>.
 * No dependencies (other than Svelte).
