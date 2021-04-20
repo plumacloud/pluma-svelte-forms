@@ -5,11 +5,11 @@ This is a client-side form library for Svelte. It's super early in developement 
 Demo app: https://pluma-svelte-forms.netlify.app/
 
 ## Main features
-* <a href="https://bundlephobia.com/result?p=pluma-svelte-forms" target="_blank" rel="noopener">Less than 2kB gzip</a>.
+* <a href="https://bundlephobia.com/result?p=pluma-svelte-forms" target="_blank" rel="noopener">Less than 3kB gzip</a>.
 * No dependencies (other than Svelte).
 * The DOM is the ultimate source of truth for values. You have total freedom to modify the DOM for complex forms. This library will figure it out.
 * You can use in-browser native validation for the most common use cases (eg: required fields).
-* Validation is sync (custom or native)
+* Validation is sync (custom or native).
 * You can add per-field external validation. This allows you to implement cancealable async validators.
 * Control when errors are displayed to tailor the user experience.
 
