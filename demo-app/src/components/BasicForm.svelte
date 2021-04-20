@@ -4,7 +4,6 @@
 
 	let submittedValues;
 
-	const displayedErrors = writable(null);
 	const controllerState = writable(null);
 
 
@@ -14,7 +13,6 @@
 		},
 		validClass: 'is-valid',
 		invalidClass: 'is-invalid',
-		displayedErrors,
 		controllerState
 	}
 
@@ -26,7 +24,7 @@
 	<form use:controller={settings} class="mb-5" autocomplete="off">
 		<div class="mb-3">
 			<label for="input-email" class="form-label">Email address</label>
-			<input type="email" name="email" class="form-control" id="input-email" aria-describedby="emailHelp" required>
+			<input type="email" name="email" class="form-control" id="input-email" required>
 		</div>
 		<div class="mb-3">
 			<label for="input-password" class="form-label">Password</label>
@@ -43,13 +41,6 @@
 		<h3>Submitted values</h3>
 		<pre>
 			{JSON.stringify(submittedValues, null, 2)}
-		</pre>
-	{/if}
-
-	{#if $displayedErrors}
-		<h3>Displayed errors</h3>
-		<pre>
-			{JSON.stringify($displayedErrors, null, 2)}
 		</pre>
 	{/if}
 
