@@ -73,20 +73,20 @@ When configuring a field you can add any number of sync validators:
 
 ```js
 function isAllCaps (value) {
-	const regexLowercase = /[a-z]/;
-	const testLowercase = regexLowercase.test(value);
+  const regexLowercase = /[a-z]/;
+  const testLowercase = regexLowercase.test(value);
 
-	if (testLowercase) return 'Only use uppercase letters';
-	return true;
+  if (testLowercase) return 'Only use uppercase letters';
+  return true;
 }
 
 const formControllerSettings = {
-	async onSubmit (values) {},
-	fields: {
-		titleInCaps: {
-			validators: [isAllCaps]
-		}
-	}
+  async onSubmit (values) {},
+  fields: {
+    titleInCaps: {
+      validators: [isAllCaps]
+    }
+  }
 }
 ```
 
@@ -98,16 +98,16 @@ You can add a per-field external validator which will have full control over the
 
 ```js
 function checkDomainIsAvailable (fieldState, eventType, update) {
-	// do your thing
+  // do your thing
 }
 
 const formControllerSettings = {
-	async onSubmit (values) {},
-	fields: {
-		domain: {
-			externalValidator: checkDomainIsAvailable
-		}
-	}
+  async onSubmit (values) {},
+  fields: {
+    domain: {
+      externalValidator: checkDomainIsAvailable
+    }
+  }
 }
 ```
 
@@ -131,12 +131,12 @@ For example, imagine you had a field called `productName` with a custom validato
 
 ```js
 const formControllerSettings = {
-	async onSubmit (values) {},
-	fields: {
-		productName: {
-			validators: [checkNameFormat]
-		}
-	}
+  async onSubmit (values) {},
+  fields: {
+    productName: {
+      validators: [checkNameFormat]
+    }
+  }
 }
 ```
 
