@@ -1,6 +1,9 @@
 export const InputTypes = {
 	'SUBMIT': 'submit',
-	'CHECKBOX': 'checkbox'
+	'CHECKBOX': 'checkbox',
+	'RADIO': 'radio',
+	'SELECT_ONE': 'select-one',
+	'SELECT_MULTIPLE': 'select-multiple'
 }
 
 export const NativeValidationErrors = {
